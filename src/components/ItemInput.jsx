@@ -1,7 +1,7 @@
 // src/components/ItemInput.jsx
 import React from 'react';
 
-function ItemInput({ label, itemData, onChange, unitOptions }) {
+function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showErrors }) {
     const handleChange = (field, value) => {
         onChange({
             ...itemData,
@@ -20,6 +20,9 @@ function ItemInput({ label, itemData, onChange, unitOptions }) {
                     value={itemData.price}
                     onChange={(e) => handleChange('price', parseFloat(e.target.value))}
                 />
+                {showErrors && errors.price && (
+                    <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.price}</div>
+                )}
             </div>
 
             <div>
@@ -29,6 +32,9 @@ function ItemInput({ label, itemData, onChange, unitOptions }) {
                     value={itemData.quantity}
                     onChange={(e) => handleChange('quantity', parseFloat(e.target.value))}
                 />
+                {showErrors && errors.quantity && (
+                    <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.quantity}</div>
+                )}
             </div>
 
             <label>Unit</label>
@@ -42,6 +48,9 @@ function ItemInput({ label, itemData, onChange, unitOptions }) {
                     </option>
                 ))}
             </select>
+            {showErrors && errors.unit && (
+                <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.unit}</div>
+            )}
         </div>
     );
 }

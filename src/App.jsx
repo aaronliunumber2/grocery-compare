@@ -9,7 +9,8 @@ function App() {
 
     const [unitType, setUnitType] = useState('volume');
     const [baseline, setBaseline] = useState('A');
-
+    const [inputErrors, setInputErrors] = useState({ itemA: {}, itemB: {} });
+    const [hasTriedCompare, setHasTriedCompare] = useState(false);
     const [itemA, setItemA] = useState({ price: '', quantity: '', unit: 'L' });
     const [itemB, setItemB] = useState({ price: '', quantity: '', unit: 'oz' });
     const [comparisonInput, setComparisonInput] = useState(null);
@@ -33,23 +34,30 @@ function App() {
         unitType === 'weight' ? weightUnits :
                 countUnits;
 
-    const isValidInput = (item) => {
-        return (
-            typeof item.price === 'number' &&
-            !isNaN(item.price) &&
-            item.price > 0 &&
-            typeof item.quantity === 'number' &&
-            !isNaN(item.quantity) &&
-            item.quantity > 0 &&
-            item.unit
-        );
+    const validateItem = (item) => {
+        const errors = {};
+        if (item.price === '' || isNaN(item.price) || item.price <= 0) {
+            errors.price = "Enter a valid price";
+        }
+        if (item.quantity === '' || isNaN(item.quantity) || item.quantity <= 0) {
+            errors.quantity = "Enter a valid quantity";
+        }
+        if (!item.unit) {
+            errors.unit = "Select a unit";
+        }
+        return errors;
     };
 
     const handleCompare = () => {
+        setHasTriedCompare(true);
 
-        if (!isValidInput(itemA) || !isValidInput(itemB)) {
-            alert("Please fill in all fields with valid numbers.");
-            return;
+        const errorsA = validateItem(itemA);
+        const errorsB = validateItem(itemB);
+
+        setInputErrors({ itemA: errorsA, itemB: errorsB });
+
+        if (Object.keys(errorsA).length || Object.keys(errorsB).length) {
+            return; // do not compare
         }
 
         setComparisonInput({
@@ -60,7 +68,6 @@ function App() {
         });
         setHasCompared(true);
 
-        // Scroll after render completes
         setTimeout(() => {
             resultRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 50);
@@ -80,8 +87,23 @@ function App() {
             </div>
 
             <div className="item-grid">
-                <ItemInput label="A" itemData={itemA} onChange={setItemA} unitOptions={unitOptions} />
-                <ItemInput label="B" itemData={itemB} onChange={setItemB} unitOptions={unitOptions} />
+                <ItemInput
+                    label="A"
+                    itemData={itemA}
+                    onChange={setItemA}
+                    unitOptions={unitOptions}
+                    errors={inputErrors.itemA}
+                    showErrors={hasTriedCompare}
+                />
+
+                <ItemInput
+                    label="B"
+                    itemData={itemB}
+                    onChange={setItemB}
+                    unitOptions={unitOptions}
+                    errors={inputErrors.itemB}
+                    showErrors={hasTriedCompare}
+                />
             </div>
 
             <div className="card">

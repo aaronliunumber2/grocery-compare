@@ -18,6 +18,17 @@ const conversionRates = {
     },
 };
 
+function formatSmartPrice(value) {
+    const roundedToFour = parseFloat(value.toFixed(4));
+    const roundedToTwo = parseFloat(value.toFixed(2));
+
+    if (roundedToFour === roundedToTwo) {
+        return roundedToTwo.toFixed(2); // Show only 2 decimals
+    } else {
+        return roundedToFour.toString(); // Show full 4-digit precision
+    }
+}
+
 function ComparisonResult({ itemA, itemB, unitType, baseline }) {
     const units = conversionRates[unitType];
 
@@ -66,8 +77,8 @@ function ComparisonResult({ itemA, itemB, unitType, baseline }) {
             <p>Normalized to: <strong>per {unitLabel}</strong></p>
 
             <ul>
-                <li>Item A: ${priceAConverted.toFixed(4)} per {unitLabel}</li>
-                <li>Item B: ${priceBConverted.toFixed(4)} per {unitLabel}</li>
+                <li>Item A: ${formatSmartPrice(priceAConverted)} per {unitLabel}</li>
+                <li>Item B: ${formatSmartPrice(priceBConverted)} per {unitLabel}</li>
             </ul>
 
             <h3>
@@ -78,7 +89,7 @@ function ComparisonResult({ itemA, itemB, unitType, baseline }) {
 
             {cheaper !== 'Neither' && (
                 <p>
-                    Difference: ${diff.toFixed(4)} per {unitLabel} ({percent}%)
+                    Difference: ${formatSmartPrice(diff)} per {unitLabel} ({percent}%)
                 </p>
             )}
         </div>

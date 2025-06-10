@@ -11,7 +11,7 @@ function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showEr
 
     return (
         <div className="card">
-            <h2>Item {label}</h2>
+            <h2>{label}</h2>
 
             <div>
                 <label>Price ($): </label>

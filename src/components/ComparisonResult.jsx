@@ -21,15 +21,12 @@ const conversionRates = {
 function formatSmartPrice(value) {
     const roundedToFour = parseFloat(value.toFixed(4));
     const roundedToTwo = parseFloat(value.toFixed(2));
-
-    if (roundedToFour === roundedToTwo) {
-        return roundedToTwo.toFixed(2); // Show only 2 decimals
-    } else {
-        return roundedToFour.toString(); // Show full 4-digit precision
-    }
+    return roundedToFour === roundedToTwo
+        ? roundedToTwo.toFixed(2)
+        : roundedToFour.toString();
 }
 
-function ComparisonResult({ itemA, itemB, unitType, baseline }) {
+function ComparisonResult({ items, unitType, baseline }) {
     const units = conversionRates[unitType];
 
     const isValid = (item) =>
@@ -37,39 +34,45 @@ function ComparisonResult({ itemA, itemB, unitType, baseline }) {
         !isNaN(item.quantity) &&
         item.unit in units;
 
-    if (!isValid(itemA) || !isValid(itemB)) {
+    if (!items.every(isValid)) {
         return <p>Fill out all item fields correctly to compare.</p>;
     }
 
-    let priceAConverted, priceBConverted, unitLabel;
+    console.log(items);
+    console.log(baseline);
 
-    if (unitType === 'count') {
-        priceAConverted = itemA.price / itemA.quantity;
-        priceBConverted = itemB.price / itemB.quantity;
-        unitLabel = 'each';
-    } else {
-        // normalize to base units
-        const baseQtyA = itemA.quantity * units[itemA.unit];
-        const baseQtyB = itemB.quantity * units[itemB.unit];
+    // Determine baseline unit
+    const baselineItem = items[baseline];
+    const baselineUnit = baselineItem.unit;
+    const baselineUnitValue = units[baselineUnit];
+    const unitLabel = unitType === 'count' ? 'each' : baselineUnit;
 
-        const basePriceA = itemA.price / baseQtyA;
-        const basePriceB = itemB.price / baseQtyB;
+    // Normalize and convert each item to baseline unit
+    const normalizedItems = items.map((item, index) => {
+        let pricePerUnit;
 
-        const baselineUnit = baseline === 'A' ? itemA.unit : itemB.unit;
-        const baselineUnitValue = units[baselineUnit];
+        if (unitType === 'count') {
+            pricePerUnit = item.price / item.quantity;
+        } else {
+            const qtyInBase = item.quantity * units[item.unit];
+            const basePrice = item.price / qtyInBase;
+            pricePerUnit = basePrice * baselineUnitValue;
+        }
 
-        priceAConverted = basePriceA * baselineUnitValue;
-        priceBConverted = basePriceB * baselineUnitValue;
-        unitLabel = baselineUnit;
-    }
+        return {
+            index,
+            label: `Item ${index + 1}`,
+            raw: item,
+            pricePerUnit,
+        };
+    });
 
-    const cheaper =
-        priceAConverted < priceBConverted ? 'Item A' :
-            priceBConverted < priceAConverted ? 'Item B' :
-                'Neither';
+    // Find the cheapest price
+    const minPrice = Math.min(...normalizedItems.map((i) => i.pricePerUnit));
 
-    const diff = Math.abs(priceAConverted - priceBConverted);
-    const percent = ((diff / Math.min(priceAConverted, priceBConverted)) * 100).toFixed(2);
+    // Identify tied items
+    const tiedItems = normalizedItems.filter(i => i.pricePerUnit === minPrice);
+    const isTie = tiedItems.length > 1;
 
     return (
         <div className="card" style={{ marginTop: '1rem' }}>
@@ -77,20 +80,48 @@ function ComparisonResult({ itemA, itemB, unitType, baseline }) {
             <p>Normalized to: <strong>per {unitLabel}</strong></p>
 
             <ul>
-                <li>Item A: ${formatSmartPrice(priceAConverted)} per {unitLabel}</li>
-                <li>Item B: ${formatSmartPrice(priceBConverted)} per {unitLabel}</li>
+                {normalizedItems.map((item) => (
+                    <li key={item.index}>
+                        <strong>{item.label}:</strong> ${formatSmartPrice(item.pricePerUnit)} per {unitLabel}
+                        {item.pricePerUnit === minPrice && (
+                            <span style={{ color: 'green', marginLeft: '0.5rem' }}>← Best value</span>
+                        )}
+                    </li>
+                ))}
             </ul>
 
             <h3>
-                {cheaper === 'Neither'
-                    ? 'Both items cost the same per unit.'
-                    : `${cheaper} is the better deal`}
+                {isTie ? (
+                    <>
+                        {tiedItems.map((item, i) => (
+                            <span key={item.index}>
+                                {item.label}{i < tiedItems.length - 1 ? ', ' : ''}
+                            </span>
+                        ))}{" "}
+                        are tied for the best value.
+                    </>
+                ) : (
+                    <>
+                        {tiedItems[0].label} is the best value.
+                    </>
+                )}
             </h3>
+            {!isTie &&normalizedItems.length > 1 && (
+                <div style={{ marginTop: '1rem' }}>
+                    {normalizedItems.map((item) => {
+                        if (item.pricePerUnit === minPrice) return null;
 
-            {cheaper !== 'Neither' && (
-                <p>
-                    Difference: ${formatSmartPrice(diff)} per {unitLabel} ({percent}%)
-                </p>
+                        const diff = item.pricePerUnit - minPrice;
+                        const percent = ((diff / minPrice) * 100).toFixed(2);
+
+                        return (
+                            <p key={item.index}>
+                                {item.label} is <strong>${formatSmartPrice(diff)}</strong> more per {unitLabel} ({percent}%)
+                                than the best value.
+                            </p>
+                        );
+                    })}
+                </div>
             )}
         </div>
     );

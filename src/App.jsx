@@ -8,22 +8,28 @@ function App() {
     const resultRef = useRef(null);
 
     const [unitType, setUnitType] = useState('volume');
-    const [baseline, setBaseline] = useState('A');
-    const [inputErrors, setInputErrors] = useState({ itemA: {}, itemB: {} });
+    const [baseline, setBaseline] = useState(0);
+    const [inputErrors, setInputErrors] = useState([{}, {}]);
     const [hasTriedCompare, setHasTriedCompare] = useState(false);
-    const [itemA, setItemA] = useState({ price: '', quantity: '', unit: 'L' });
-    const [itemB, setItemB] = useState({ price: '', quantity: '', unit: 'oz' });
+    const [items, setItems] = useState([
+        { price: '', quantity: '', unit: 'L' },
+        { price: '', quantity: '', unit: 'oz' }
+    ]);
     const [comparisonInput, setComparisonInput] = useState(null);
     const [hasCompared, setHasCompared] = useState(false);
 
     useEffect(() => {
         const defaultUnit =
             unitType === 'volume' ? 'L' :
-            unitType === 'weight' ? 'g' :
-            'count';
+                unitType === 'weight' ? 'g' :
+                    'count';
 
-        setItemA((prev) => ({ ...prev, unit: defaultUnit }));
-        setItemB((prev) => ({ ...prev, unit: defaultUnit }));
+        setItems((prevItems) =>
+            prevItems.map((item) => ({
+                ...item,
+                unit: defaultUnit
+            }))
+        );
     }, [unitType]);
 
     const volumeUnits = ['L', 'ml', 'oz', 'qt'];
@@ -51,21 +57,18 @@ function App() {
     const handleCompare = () => {
         setHasTriedCompare(true);
 
-        const errorsA = validateItem(itemA);
-        const errorsB = validateItem(itemB);
+        const allErrors = items.map(validateItem);
+        setInputErrors(allErrors);
 
-        setInputErrors({ itemA: errorsA, itemB: errorsB });
-
-        if (Object.keys(errorsA).length || Object.keys(errorsB).length) {
-            return; // do not compare
-        }
+        const hasErrors = allErrors.some((err) => Object.keys(err).length > 0);
+        if (hasErrors) return;
 
         setComparisonInput({
-            itemA: { ...itemA },
-            itemB: { ...itemB },
+            items: [...items],
             unitType,
             baseline,
         });
+
         setHasCompared(true);
 
         setTimeout(() => {
@@ -87,30 +90,31 @@ function App() {
             </div>
 
             <div className="item-grid">
-                <ItemInput
-                    label="A"
-                    itemData={itemA}
-                    onChange={setItemA}
-                    unitOptions={unitOptions}
-                    errors={inputErrors.itemA}
-                    showErrors={hasTriedCompare}
-                />
-
-                <ItemInput
-                    label="B"
-                    itemData={itemB}
-                    onChange={setItemB}
-                    unitOptions={unitOptions}
-                    errors={inputErrors.itemB}
-                    showErrors={hasTriedCompare}
-                />
+                {items.map((item, index) => (
+                    <ItemInput
+                        key={index}
+                        label={`Item ${index + 1}`}
+                        itemData={item}
+                        onChange={(updatedItem) => {
+                            const newItems = [...items];
+                            newItems[index] = updatedItem;
+                            setItems(newItems);
+                        }}
+                        unitOptions={unitOptions}
+                        errors={inputErrors[index] || {}}
+                        showErrors={hasTriedCompare}
+                    />
+                ))}
             </div>
 
             <div className="card">
                 <label>Compare using: </label>
-                <select value={baseline} onChange={(e) => setBaseline(e.target.value)}>
-                    <option value="A">Item A's unit</option>
-                    <option value="B">Item B's unit</option>
+                <select value={baseline} onChange={(e) => setBaseline(Number(e.target.value))}>
+                    {items.map((item, index) => (
+                        <option key={index} value={index}>
+                            Item {index + 1}'s unit
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -121,8 +125,7 @@ function App() {
             {hasCompared && comparisonInput && (
                 <div ref={resultRef}>
                     <ComparisonResult
-                        itemA={comparisonInput.itemA}
-                        itemB={comparisonInput.itemB}
+                        items={comparisonInput.items}
                         unitType={comparisonInput.unitType}
                         baseline={comparisonInput.baseline}
                     />

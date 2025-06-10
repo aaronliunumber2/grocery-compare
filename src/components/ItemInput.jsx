@@ -44,7 +44,7 @@ function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showEr
             >
                 {unitOptions.map((u) => (
                     <option key={u} value={u}>
-                        {u === 'count' ? 'Each' : u} {/* Display-friendly name */}
+                        {u === 'count' ? 'Each' : u}
                     </option>
                 ))}
             </select>

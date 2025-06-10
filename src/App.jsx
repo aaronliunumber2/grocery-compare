@@ -32,7 +32,7 @@ function App() {
         );
     }, [unitType]);
 
-    const volumeUnits = ['L', 'ml', 'oz', 'qt'];
+    const volumeUnits = ['L', 'ml', 'oz', 'qt', 'gal'];
     const weightUnits = ['g', 'kg', 'oz', 'lb'];
     const countUnits = ['count']; // just one option for now
     const unitOptions =

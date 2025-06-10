@@ -6,6 +6,7 @@ const conversionRates = {
         ml: 1,
         oz: 29.5735,
         qt: 946.353,
+        gal: 3785.41,
     },
     weight: {
         g: 1,

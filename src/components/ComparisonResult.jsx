@@ -38,9 +38,6 @@ function ComparisonResult({ items, unitType, baseline }) {
         return <p>Fill out all item fields correctly to compare.</p>;
     }
 
-    console.log(items);
-    console.log(baseline);
-
     // Determine baseline unit
     const baselineItem = items[baseline];
     const baselineUnit = baselineItem.unit;

@@ -27,7 +27,7 @@ function formatSmartPrice(value) {
         : roundedToFour.toString();
 }
 
-function ComparisonResult({ items, unitType, baseline }) {
+function ComparisonResult({ items, unitType, baseline, setBaseline }) {
     const units = conversionRates[unitType];
 
     const isValid = (item) =>
@@ -104,21 +104,34 @@ function ComparisonResult({ items, unitType, baseline }) {
                     </>
                 )}
             </h3>
-            {!isTie &&normalizedItems.length > 1 && (
+            {!isTie && normalizedItems.length > 1 && (
                 <div style={{ marginTop: '1rem' }}>
                     {normalizedItems.map((item) => {
                         if (item.pricePerUnit === minPrice) return null;
 
                         const diff = item.pricePerUnit - minPrice;
-                        const percent = ((diff / minPrice) * 100).toFixed(2);
+                        const percent = ((diff / item.pricePerUnit) * 100).toFixed(2);
 
                         return (
                             <p key={item.index}>
-                                {item.label} is <strong>${formatSmartPrice(diff)}</strong> more per {unitLabel} ({percent}%)
-                                than the best value.
+                                Choosing <strong>{tiedItems[0].label}</strong> instead of <strong>{item.label}</strong>,
+                                saves you <strong>${formatSmartPrice(diff)}</strong> per {unitLabel} ({percent}%).
                             </p>
                         );
                     })}
+                </div>
+            )}
+
+            {unitType !== 'count' && (
+                <div style={{ marginTop: '1.5rem' }}>
+                    <label>Compare using: </label>
+                    <select value={baseline} onChange={(e) => setBaseline(Number(e.target.value))}>
+                        {items.map((item, index) => (
+                            <option key={index} value={index}>
+                                Item {index + 1}'s unit
+                            </option>
+                        ))}
+                    </select>
                 </div>
             )}
         </div>

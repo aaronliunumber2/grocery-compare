@@ -67,7 +67,6 @@ function App() {
         setComparisonInput({
             items: [...items],
             unitType,
-            baseline,
         });
 
         setHasCompared(true);
@@ -145,17 +144,6 @@ function App() {
                 ➕ Add Item
             </button>
 
-            <div className="card">
-                <label>Compare using: </label>
-                <select value={baseline} onChange={(e) => setBaseline(Number(e.target.value))}>
-                    {items.map((item, index) => (
-                        <option key={index} value={index}>
-                            Item {index + 1}'s unit
-                        </option>
-                    ))}
-                </select>
-            </div>
-
             {/* Compare Button */}
             <button onClick={handleCompare}>Compare Prices</button>
 
@@ -165,7 +153,8 @@ function App() {
                     <ComparisonResult
                         items={comparisonInput.items}
                         unitType={comparisonInput.unitType}
-                        baseline={comparisonInput.baseline}
+                        baseline={baseline}
+                        setBaseline={setBaseline}
                     />
                 </div>
             )}

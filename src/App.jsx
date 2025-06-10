@@ -1,4 +1,4 @@
-// src/App.jsx
+﻿// src/App.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import ItemInput from './components/ItemInput';
 import ComparisonResult from './components/ComparisonResult';
@@ -6,6 +6,7 @@ import './App.css';
 
 function App() {
     const resultRef = useRef(null);
+    const lastItemRef = useRef(null);
 
     const [unitType, setUnitType] = useState('volume');
     const [baseline, setBaseline] = useState(0);
@@ -76,6 +77,30 @@ function App() {
         }, 50);
     };
 
+    const addNewItem = () => {
+        const defaultUnit =
+            unitType === 'volume' ? 'L' :
+                unitType === 'weight' ? 'g' :
+                    'count';
+
+        setItems((prevItems) => {
+            const newItems = [
+                ...prevItems,
+                { price: '', quantity: '', unit: defaultUnit }
+            ];
+
+            // scroll to new item after render
+            setTimeout(() => {
+                lastItemRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            return newItems;
+        });
+
+        // also add a placeholder error object
+        setInputErrors((prevErrors) => [...prevErrors, {}]);
+    };
+
     return (
         <div className="container">
             <h1>Grocery Unit Price Comparator</h1>
@@ -103,9 +128,22 @@ function App() {
                         unitOptions={unitOptions}
                         errors={inputErrors[index] || {}}
                         showErrors={hasTriedCompare}
+                        onRemove={() => {
+                            if (items.length > 2) {
+                                const newItems = items.filter((_, i) => i !== index);
+                                setItems(newItems);
+                                setInputErrors((prev) => prev.filter((_, i) => i !== index));
+                            }
+                        }}
+                        canRemove={index > 1}
+                        ref={index === items.length - 1 ? lastItemRef : null}
                     />
                 ))}
             </div>
+
+            <button onClick={addNewItem}>
+                ➕ Add Item
+            </button>
 
             <div className="card">
                 <label>Compare using: </label>

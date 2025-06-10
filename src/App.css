@@ -49,11 +49,9 @@ button {
 }
 
 .item-grid {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    justify-content: space-between;
-    margin-bottom: 1rem;
 }
 
 .item-grid .card {
@@ -64,5 +62,11 @@ button {
 @media (max-width: 350px) {
     .item-grid {
         flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .item-grid {
+        grid-template-columns: 1fr;
     }
 }

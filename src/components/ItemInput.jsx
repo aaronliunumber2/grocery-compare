@@ -1,7 +1,17 @@
-// src/components/ItemInput.jsx
-import React from 'react';
+﻿import React, { forwardRef } from 'react';
 
-function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showErrors }) {
+const ItemInput = forwardRef(function ItemInput(props, ref) {
+    const {
+        label,
+        itemData,
+        onChange,
+        unitOptions,
+        errors = {},
+        showErrors,
+        onRemove,
+        canRemove
+    } = props;
+
     const handleChange = (field, value) => {
         onChange({
             ...itemData,
@@ -10,15 +20,15 @@ function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showEr
     };
 
     return (
-        <div className="card">
+        <div className="card" ref={ref}>
             <h2>{label}</h2>
 
             <div>
-                <label>Price ($): </label>
+                <label>Price ($)</label>
                 <input
                     type="number"
                     value={itemData.price}
-                    onChange={(e) => handleChange('price', parseFloat(e.target.value))}
+                    onChange={(e) => handleChange('price', parseFloat(e.target.value) || '')}
                 />
                 {showErrors && errors.price && (
                     <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.price}</div>
@@ -26,33 +36,53 @@ function ItemInput({ label, itemData, onChange, unitOptions, errors = {}, showEr
             </div>
 
             <div>
-                <label>Quantity: </label>
+                <label>Quantity</label>
                 <input
                     type="number"
                     value={itemData.quantity}
-                    onChange={(e) => handleChange('quantity', parseFloat(e.target.value))}
+                    onChange={(e) => handleChange('quantity', parseFloat(e.target.value) || '')}
                 />
                 {showErrors && errors.quantity && (
                     <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.quantity}</div>
                 )}
             </div>
 
-            <label>Unit</label>
-            <select
-                value={itemData.unit}
-                onChange={(e) => handleChange('unit', e.target.value)}
-            >
-                {unitOptions.map((u) => (
-                    <option key={u} value={u}>
-                        {u === 'count' ? 'Each' : u}
-                    </option>
-                ))}
-            </select>
-            {showErrors && errors.unit && (
-                <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.unit}</div>
+            <div>
+                <label>Unit</label>
+                <select
+                    value={itemData.unit}
+                    onChange={(e) => handleChange('unit', e.target.value)}
+                >
+                    {unitOptions.map((u) => (
+                        <option key={u} value={u}>
+                            {u === 'count' ? 'Each' : u === 'gal' ? 'Gallon' : u}
+                        </option>
+                    ))}
+                </select>
+                {showErrors && errors.unit && (
+                    <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.unit}</div>
+                )}
+            </div>
+
+            {canRemove && (
+                <button
+                    style={{
+                        backgroundColor: 'red',
+                        color: 'white',
+                        marginTop: '0.75rem',
+                        padding: '0.5rem',
+                        width: '100%',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                    }}
+                    onClick={onRemove}
+                >
+                    ❌ Remove
+                </button>
             )}
         </div>
     );
-}
+});
 
 export default ItemInput;

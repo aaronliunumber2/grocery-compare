@@ -61,12 +61,6 @@ button {
 
 @media (max-width: 350px) {
     .item-grid {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 600px) {
-    .item-grid {
         grid-template-columns: 1fr;
     }
 }

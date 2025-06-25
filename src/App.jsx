@@ -47,7 +47,7 @@ function App() {
             errors.price = "Enter a valid price";
         }
         if (item.quantity === '' || isNaN(item.quantity) || item.quantity <= 0) {
-            errors.quantity = "Enter a valid quantity";
+            errors.quantity = "Enter a valid amount";
         }
         if (item.count === '' || isNaN(item.count) || item.count <= 0) {
             errors.count = "Enter a valid count";

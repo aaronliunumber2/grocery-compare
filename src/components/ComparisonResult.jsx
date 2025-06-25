@@ -50,9 +50,9 @@ function ComparisonResult({ items, unitType, baseline, setBaseline }) {
         let pricePerUnit;
 
         if (unitType === 'count') {
-            pricePerUnit = item.price / item.quantity;
+            pricePerUnit = item.price / item.quantity * item.count;
         } else {
-            const qtyInBase = item.quantity * units[item.unit];
+            const qtyInBase = item.quantity * item.count * units[item.unit];
             const basePrice = item.price / qtyInBase;
             pricePerUnit = basePrice * baselineUnitValue;
         }

@@ -13,8 +13,8 @@ function App() {
     const [inputErrors, setInputErrors] = useState([{}, {}]);
     const [hasTriedCompare, setHasTriedCompare] = useState(false);
     const [items, setItems] = useState([
-        { price: '', quantity: '', unit: 'L' },
-        { price: '', quantity: '', unit: 'oz' }
+        { price: '', quantity: '', count: 1, unit: 'L' },
+        { price: '', quantity: '', count: 1, unit: 'oz' }
     ]);
     const [comparisonInput, setComparisonInput] = useState(null);
     const [hasCompared, setHasCompared] = useState(false);

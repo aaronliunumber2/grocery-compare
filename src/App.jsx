@@ -49,6 +49,9 @@ function App() {
         if (item.quantity === '' || isNaN(item.quantity) || item.quantity <= 0) {
             errors.quantity = "Enter a valid quantity";
         }
+        if (item.count === '' || isNaN(item.count) || item.count <= 0) {
+            errors.count = "Enter a valid count";
+        }
         if (!item.unit) {
             errors.unit = "Select a unit";
         }

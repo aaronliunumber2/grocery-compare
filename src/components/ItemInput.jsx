@@ -36,35 +36,33 @@ const ItemInput = forwardRef(function ItemInput(props, ref) {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div>
-                        <label>Count</label>
-                        <input
-                            type="number"
-                            min="1"
-                            value={itemData.count || 1}
-                            onChange={(e) => handleChange('count', parseInt(e.target.value) || 1)}
-                            style={{ width: '60px' }}
-                        />
-                        {showErrors && errors.count && (
-                            <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.count}</div>
-                        )}
-                    </div>
 
-                    <span style={{ fontSize: '1.5rem', marginTop: '1.5rem' }}>×</span>
-
-                    <div>
-                        <label>Quantity</label>
-                        <input
-                            type="number"
-                            value={itemData.quantity}
-                            onChange={(e) => handleChange('quantity', parseFloat(e.target.value) || '')}
-                        />
-                        {showErrors && errors.quantity && (
-                            <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.quantity}</div>
-                        )}
-                    </div>
+                <div>
+                    <label>Count</label>
+                    <input
+                        type="number"
+                        value={itemData.count}
+                        onChange={(e) => handleChange('count', parseInt(e.target.value) || '')}
+                    />
+                    {showErrors && errors.count && (
+                        <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.count}</div>
+                    )}
                 </div>
+
+                <span style={{ fontSize: '1.5rem' }}>×</span>
+
+                <div>
+                    <label>Amount</label>
+                    <input
+                        type="number"
+                        value={itemData.quantity}
+                        onChange={(e) => handleChange('quantity', parseFloat(e.target.value) || '')}
+                    />
+                    {showErrors && errors.quantity && (
+                        <div style={{ color: 'red', fontSize: '0.85rem' }}>{errors.quantity}</div>
+                    )}
+                </div>
+
 
                 <div>
                     <label>Unit</label>
